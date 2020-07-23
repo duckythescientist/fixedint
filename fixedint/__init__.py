@@ -1,7 +1,20 @@
 #!/usr/bin/env python3
 
+__all__ = [
+    "uint8",
+    "uint16",
+    "uint32",
+    "uint64",
+    "uint8_be",
+    "uint16_be",
+    "uint32_be",
+    "uint64_be",
+]
+
+
 from functools import wraps
 import struct
+
 
 class _cint(int):
     """Fixed-width unsigned integer types
@@ -11,6 +24,7 @@ class _cint(int):
 
     the p* properties expose packed bytes representations of the integer
     """
+
     size = 0
     byteorder = "little"
 
@@ -18,9 +32,10 @@ class _cint(int):
     def create_type(cls, size, byteorder="little"):
         class newclass(cls):
             pass
+
         newclass.size = size
         newclass.byteorder = byteorder
-        name = "uint{}".format(size*8)
+        name = "uint{}".format(size * 8)
         newclass.__name__ = name
         return newclass
 
@@ -32,31 +47,69 @@ class _cint(int):
             value = int.from_bytes(value, byteorder=cls.byteorder)
 
         value = int(value)
-
         value &= mask
         this = int.__new__(cls, value)
+        this.size = cls.size
 
-        def force(func):
+        def _cast(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
-                return cls(func(*args, **kwargs))
+                return cls(int(func(*args, **kwargs)))
+
             return wrapper
-        setattr(cls, "__add__",     force(int.__add__))
-        setattr(cls, "__sub__",     force(int.__sub__))
-        setattr(cls, "__mul__",     force(int.__mul__))
-        setattr(cls, "__truediv__", force(int.__truediv__))
-        setattr(cls, "__lshift__",  force(int.__lshift__))
-        setattr(cls, "__rshift__",  force(int.__rshift__))
-        setattr(cls, "__and__",     force(int.__and__))
-        setattr(cls, "__xor__",     force(int.__xor__))
-        setattr(cls, "__or__",      force(int.__or__))
-        setattr(cls, "__neg__",     force(int.__neg__))
-        setattr(cls, "__invert__",  force(int.__invert__))
-        this.size = cls.size
+
+        def soft_cast(func):
+            # Work with integers when possible.
+            @wraps(func)
+            def wrapper(self, other):
+                if other == int(other):
+                    result = func(self, int(other))
+                else:
+                    result = func(self, other)
+                if result == NotImplemented:
+                    return NotImplemented
+                elif result == int(result):
+                    return cls(result)
+                else:
+                    return result
+
+            return wrapper
+
+        def hard_cast(func):
+            # Require that everything is an integer
+            @wraps(func)
+            def wrapper(self, other):
+                if other != int(other):
+                    raise TypeError("Integer argument required")
+                result = func(self, int(other))
+                return cls(result)
+
+            return wrapper
+
+        # For +-*/ keep everything as an int when possible.
+        setattr(cls, "__add__", soft_cast(int.__add__))
+        setattr(cls, "__sub__", soft_cast(int.__sub__))
+        setattr(cls, "__mul__", soft_cast(int.__mul__))
+        setattr(cls, "__truediv__", soft_cast(int.__truediv__))
+
+        # For the more integer-centric maths, require integers.
+        setattr(cls, "__floordiv__", hard_cast(int.__floordiv__))
+        setattr(cls, "__mod__", hard_cast(int.__mod__))
+        setattr(cls, "__divmod__", hard_cast(int.__divmod__))
+        # __pow__ is a special case
+        setattr(cls, "__lshift__", hard_cast(int.__lshift__))
+        setattr(cls, "__rshift__", hard_cast(int.__rshift__))
+        setattr(cls, "__and__", hard_cast(int.__and__))
+        setattr(cls, "__xor__", hard_cast(int.__xor__))
+        setattr(cls, "__or__", hard_cast(int.__or__))
+
+        setattr(cls, "__neg__", _cast(int.__neg__))
+        setattr(cls, "__invert__", _cast(int.__invert__))
+
         return this
 
     def __repr__(self):
-        return f"<{type(self).__name__} 0x{self:0{self.size*2}x}>"
+        return f"<{type(self).__name__} 0x{self:0{self.size*2}x} ({int(self)})>"
 
     def __bytes__(self):
         """Return the int packed as bytes
@@ -70,6 +123,8 @@ class _cint(int):
         return cls(val)
 
     def __pow__(self, other, modulo=None):
+        if modulo is None and other != int(other):
+            return pow(int(self), other)
         if modulo is None:
             modulo = 1 << (8 * self.size)
         return self.cast(pow(int(self), int(other), modulo))
@@ -105,7 +160,7 @@ class _cint(int):
             return "e"
         elif cls.size == 4:
             return "f"
-        elif cls.size == 4:
+        elif cls.size == 8:
             return "d"
         else:
             return None
@@ -171,6 +226,7 @@ class uint8(_cint):
     size = 1
     byteorder = "little"
 
+
 class uint16(_cint):
     size = 2
 
@@ -181,6 +237,27 @@ class uint32(_cint):
 
 class uint64(_cint):
     size = 8
+
+
+class uint8_be(_cint):
+    byteorder = "big"
+    size = 1
+
+
+class uint16_be(_cint):
+    byteorder = "big"
+    size = 2
+
+
+class uint32_be(_cint):
+    byteorder = "big"
+    size = 4
+
+
+class uint64_be(_cint):
+    byteorder = "big"
+    size = 8
+
 
 # # Programmatically create new types:
 # uint32 = _cint.create_type(4)
