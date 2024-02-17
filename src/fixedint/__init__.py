@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 __all__ = [
-    "uint8",
-    "uint16",
-    "uint32",
-    "uint64",
-    "uint8_be",
-    "uint16_be",
-    "uint32_be",
-    "uint64_be",
+    "UInt8",
+    "UInt16",
+    "UInt32",
+    "UInt64",
+    # "uint8_be",
+    # "uint16_be",
+    # "uint32_be",
+    # "uint64_be",
 ]
 
 
@@ -17,7 +17,7 @@ import struct
 
 
 class _cint(int):
-    """Fixed-width unsigned integer types
+    """Fixed-width integer types
 
     Create a class type by inheriting from _cint and setting
     `size` [and `byteorder`] or by calling `create_type`
@@ -27,6 +27,7 @@ class _cint(int):
 
     size = 0
     byteorder = "little"
+    signed = False
 
     @classmethod
     def create_type(cls, size, byteorder="little"):
@@ -109,7 +110,7 @@ class _cint(int):
         return this
 
     def __repr__(self):
-        return f"<{type(self).__name__} 0x{self:0{self.size*2}x} ({int(self)})>"
+        return f"{type(self).__name__}(0x{self:0{self.size*2}x}) # {int(self)}"
 
     def __bytes__(self):
         """Return the int packed as bytes
@@ -222,41 +223,41 @@ class _cint(int):
             return int(rest)
 
 
-class uint8(_cint):
+class UInt8(_cint):
     size = 1
     byteorder = "little"
 
 
-class uint16(_cint):
+class UInt16(_cint):
     size = 2
 
 
-class uint32(_cint):
+class UInt32(_cint):
     size = 4
 
 
-class uint64(_cint):
+class UInt64(_cint):
     size = 8
 
 
-class uint8_be(_cint):
-    byteorder = "big"
-    size = 1
+# class uint8_be(_cint):
+#     byteorder = "big"
+#     size = 1
 
 
-class uint16_be(_cint):
-    byteorder = "big"
-    size = 2
+# class uint16_be(_cint):
+#     byteorder = "big"
+#     size = 2
 
 
-class uint32_be(_cint):
-    byteorder = "big"
-    size = 4
+# class uint32_be(_cint):
+#     byteorder = "big"
+#     size = 4
 
 
-class uint64_be(_cint):
-    byteorder = "big"
-    size = 8
+# class uint64_be(_cint):
+#     byteorder = "big"
+#     size = 8
 
 
 # # Programmatically create new types:
