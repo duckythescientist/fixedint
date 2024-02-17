@@ -4,6 +4,15 @@
 from fixedint import *
 
 
+def test_math_preserves_type():
+    spam = UInt8(21)
+    spam >>= 1
+    spam |= 1
+    spam += 2
+    assert isinstance(spam, UInt8)
+    assert not isinstance(spam, UInt16)
+
+
 def test_shifts():
     spam = UInt8(21)
     assert spam == 21

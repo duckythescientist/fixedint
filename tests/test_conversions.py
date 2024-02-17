@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 
+import pytest
 
 from fixedint import *
+
+
+def test_inheritance():
+    spam = UInt8(12)
+    assert isinstance(spam, int)
 
 
 def test_cast():
@@ -31,6 +37,16 @@ def test_pack_unpack():
     assert spam == 0x4241
     assert bytes(spam) == b"AB"
 
-    # eggs = uint16_be(b"AB")
-    # assert eggs == 0x4142
-    # assert bytes(eggs) == b"AB"
+    eggs = UInt16_be(b"AB")
+    assert eggs == 0x4142
+    assert bytes(eggs) == b"AB"
+
+
+def test_bad_initial_value():
+    # Try making a FixedInt from two things that are definitely not
+    # castable to FixedInt
+    pytest.raises(TypeError, UInt8, pytest)
+    pytest.raises(TypeError, UInt8, object)
+    # Also a float isn't pleasantly castable to int.
+    pytest.raises(TypeError, UInt8, 3.0)
+    pytest.raises(TypeError, UInt8, 3.14)

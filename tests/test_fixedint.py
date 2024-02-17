@@ -28,13 +28,13 @@ def test_repr():
 
 
 # def test_repr_str():
-#     spam = uint8(21)
+#     spam = UInt8(21)
 #     assert str(spam) == "21"
-#     spam = uint16(21)
+#     spam = UInt16(21)
 #     assert str(spam) == "21"
-#     spam = uint32(21)
+#     spam = UInt32(21)
 #     assert spam == 21
 #     assert str(spam) == "21"
-#     spam = uint64(21)
+#     spam = UInt64(21)
 #     assert spam == 21
 #     assert str(spam) == "21"
