@@ -72,11 +72,11 @@ for i in range(UInt32(3)):
 ## Works as ints in most places
 
 
-# FixedInts keep their type if they the left-operand
+# FixedInts keep their type if they are the left-operand.
 type(UInt8(1) + 1)
 ## fixedint.stdint.UInt8
 
-# but they lose their type if they are a right-operand
+# but they lose their type if they are a right-operand.
 type(1 + UInt8(2))
 ## int
 

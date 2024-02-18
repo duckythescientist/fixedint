@@ -1,6 +1,6 @@
 # Fixed-width integers for Python
 
-They look like `int`s, walk like `int`s and quack like `int`s, but they over/underflow like machine arithmetic.
+They look like `int`s, walk like `int`s, and quack like `int`s, but they over/underflow like machine arithmetic.
 
 This library is still in an early state. Expect API changes and refactoring.
 
@@ -80,11 +80,11 @@ for i in range(UInt32(3)):
 ## Works as ints in most places
 
 
-# FixedInts keep their type if they the left-operand
+# FixedInts keep their type if they are the left-operand.
 type(UInt8(1) + 1)
 ## fixedint.stdint.UInt8
 
-# but they lose their type if they are a right-operand
+# but they lose their type if they are a right-operand.
 type(1 + UInt8(2))
 ## int
 
