@@ -39,6 +39,18 @@ def test_bitwise():
     assert spam * 3 == 63
 
 
+def test_unary():
+    spam = UInt16(3)
+    assert +spam == 3
+    assert -spam == UInt16(-3)
+    assert isinstance(+spam, UInt16)
+    assert -spam == 0xFFFD
+    assert isinstance(-spam, UInt16)
+    assert ~spam == 0xFFFC
+    assert ~spam == UInt16(~3)
+    assert isinstance(~spam, UInt16)
+
+
 def test_pow():
     spam = UInt32(3)
     eggs = spam**2

@@ -43,6 +43,7 @@ class FixedIntMeta(type):
             return wrapper
 
         setattr(cls, "__neg__", _cast(int.__neg__))
+        setattr(cls, "__pos__", _cast(int.__pos__))
         setattr(cls, "__invert__", _cast(int.__invert__))
 
         # For +-*/ keep everything as an int when possible.
@@ -55,7 +56,7 @@ class FixedIntMeta(type):
         setattr(cls, "__floordiv__", hard_cast(int.__floordiv__))
         setattr(cls, "__mod__", hard_cast(int.__mod__))
         setattr(cls, "__divmod__", hard_cast(int.__divmod__))
-        # __pow__ is a special case
+        # __pow__ is a special case since it can take a second argument.
         setattr(cls, "__lshift__", hard_cast(int.__lshift__))
         setattr(cls, "__rshift__", hard_cast(int.__rshift__))
         setattr(cls, "__and__", hard_cast(int.__and__))
