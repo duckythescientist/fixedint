@@ -135,6 +135,18 @@ class FixedInt(int, metaclass=FixedIntMeta):
         top = self.mask & (0 - self.msb) & ~lowmask
         return (self >> shiftnum) | top
 
+    def ror(self, rotatenum):
+        """Rotate right"""
+        right_n = rotatenum % (8 * self.size)
+        left_n = 8 * self.size - right_n
+        left = self << left_n
+        right = self >> right_n
+        return left | right
+
+    def rol(self, rotatenum):
+        """Rotate left"""
+        return self.ror(-rotatenum)
+
     @property
     def mask(self):
         return self.cast((1 << (self.size * 8)) - 1)

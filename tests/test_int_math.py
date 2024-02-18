@@ -113,3 +113,11 @@ def test_sar():
 
 def test_mask():
     assert UInt8(12).mask == 0xFF
+
+
+def test_rotate():
+    spam = UInt16(0xABCD)
+    assert spam.ror(4) == UInt16(0xDABC)
+    assert spam.ror(4 + 16) == UInt16(0xDABC)
+    assert spam.rol(4) == UInt16(0xBCDA)
+    assert spam.rol(4 + 16) == UInt16(0xBCDA)
